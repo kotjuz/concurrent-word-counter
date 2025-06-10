@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 var wordList = []string{
 	"apple", "banana", "orange", "grape", "peach",
 	"dog", "cat", "mouse", "rabbit", "fox",
@@ -7,5 +9,9 @@ var wordList = []string{
 }
 
 func main() {
-	GenerateFiles(wordList)
+	err := GenerateFiles(wordList)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }

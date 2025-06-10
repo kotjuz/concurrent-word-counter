@@ -37,4 +37,5 @@ func GenerateFiles(wordList []string) error {
 		}
 
 	}
+	return nil
 }
