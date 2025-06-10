@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -15,17 +16,20 @@ var (
 		"dog", "cat", "mouse", "rabbit", "fox",
 		"book", "pen", "notebook", "paper", "pencil",
 	}
-	maxWorkers = 5
 
 	resultMap = make(map[string]int)
 
-	wg        sync.WaitGroup
-	mu        sync.Mutex
-	semaphore = make(chan struct{}, maxWorkers)
+	wg sync.WaitGroup
+	mu sync.Mutex
 )
 
 func main() {
-	err := GenerateFiles(wordList)
+	maxWorkers := flag.Int("workers", 5, "Number of concurrent files being processed")
+	fileNumber := flag.Int("filenum", 10, "Number of files to generate")
+	flag.Parse()
+
+	semaphore := make(chan struct{}, *maxWorkers)
+	err := GenerateFiles(wordList, *fileNumber)
 	if err != nil {
 		fmt.Println(err)
 		return
