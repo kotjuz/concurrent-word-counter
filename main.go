@@ -21,7 +21,7 @@ var (
 
 	wg        sync.WaitGroup
 	mu        sync.Mutex
-	semaphore chan struct{}
+	semaphore = make(chan struct{}, maxWorkers)
 )
 
 func main() {
@@ -43,7 +43,14 @@ func main() {
 			continue
 		}
 		wg.Add(1)
-		go processFile(filepath.Join(dirPath, file.Name()))
+		semaphore <- struct{}{}
+		go func(path string) {
+			defer wg.Done()
+			defer func() { <-semaphore }()
+
+			processFile(path)
+		}(filepath.Join(dirPath, file.Name()))
+
 	}
 	wg.Wait()
 
@@ -56,8 +63,6 @@ func main() {
 }
 
 func processFile(filePath string) error {
-	defer wg.Done()
-
 	file, err := os.Open(filePath)
 
 	if err != nil {
